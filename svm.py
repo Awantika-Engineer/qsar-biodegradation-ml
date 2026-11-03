@@ -5,6 +5,7 @@ import joblib
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.calibration import CalibratedClassifierCV
 
 from sklearn.metrics import (
     accuracy_score,
@@ -29,12 +30,16 @@ y_test = test_df["target"]
 # 3. Create SVM pipeline with feature scaling
 model = Pipeline([
     ("scaler", StandardScaler()),
-    ("classifier", SVC(
-        kernel="rbf",
-        C=1.0,
-        gamma="scale",
-        probability=True,
-        random_state=42
+    ("classifier", CalibratedClassifierCV(
+        estimator=SVC(
+            kernel="rbf",
+            C=1.0,
+            gamma="scale",
+            random_state=42
+        ),
+        method="sigmoid",
+        cv=5,
+        ensemble=False
     ))
 ])
 

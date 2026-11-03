@@ -81,7 +81,12 @@ if uploaded_file is not None:
 
         st.subheader("3. Uploaded Dataset Preview")
 
-        st.dataframe(test_df.head(10), use_container_width=True)
+        # Expandable dataset preview
+        with st.expander("View Uploaded Dataset Preview", expanded=False):
+            st.dataframe(
+                test_df.head(10),
+                use_container_width=True
+            )
 
         col1, col2, col3 = st.columns(3)
 
@@ -241,7 +246,7 @@ if uploaded_file is not None:
         labels=[0, 1]
     )
 
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(5, 4), dpi=100)
 
     display = ConfusionMatrixDisplay(
         confusion_matrix=cm,
@@ -252,8 +257,14 @@ if uploaded_file is not None:
 
     ax.set_title(f"{selected_model} - Confusion Matrix")
 
-    st.pyplot(fig)
+    st.pyplot(fig, width="content")
     plt.close(fig)
+
+    st.caption(
+    "Rows represent actual classes and columns represent predicted classes. "
+    "Diagonal cells indicate correct predictions, while off-diagonal cells "
+    "indicate misclassifications. Darker shades represent higher sample counts."
+    )
 
     # 9. Classification Report
     st.subheader("6. Classification Report")
@@ -269,8 +280,17 @@ if uploaded_file is not None:
 
     report_df = pd.DataFrame(report).transpose()
 
+    # Accuracy is already displayed separately in evaluation metrics.
+    # Remove the duplicated accuracy row to avoid misleading columns.
+    report_df = report_df.drop(index="accuracy", errors="ignore")
+
     st.dataframe(
-        report_df.round(4),
+        report_df.style.format({
+            "precision": "{:.4f}",
+            "recall": "{:.4f}",
+            "f1-score": "{:.4f}",
+            "support": "{:.0f}"
+        }),
         use_container_width=True
     )
 

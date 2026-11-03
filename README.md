@@ -52,6 +52,8 @@ The following five classification algorithms were implemented using Scikit-learn
 
 StandardScaler was applied using pipelines for Logistic Regression, KNN, and SVM.
 
+For SVM, an RBF kernel was used with sigmoid probability calibration through CalibratedClassifierCV (5-fold cross-validation, ensemble=False) to obtain class probabilities for AUC evaluation.
+
 All models were trained using the same training dataset and evaluated on the same held-out test dataset.
 
 ## 5. Model Evaluation Results
@@ -62,9 +64,29 @@ All models were trained using the same training dataset and evaluated on the sam
 | Decision Tree | 0.8152 | 0.7844 | 0.7424 | 0.6901 | 0.7153 | 0.5796 |
 | KNN | 0.8531 | 0.8973 | 0.7703 | 0.8028 | 0.7862 | 0.6747 |
 | Gaussian Naive Bayes | 0.6967 | 0.8650 | 0.5276 | 0.9437 | 0.6768 | 0.4972 |
-| SVM | 0.8483 | 0.9189 | 0.7910 | 0.7465 | 0.7681 | 0.6562 |
+| SVM | 0.8531 | 0.9189 | 0.7941 | 0.7606 | 0.7770 | 0.6679 |
 
 All metrics were calculated using the test dataset containing 211 observations.
+
+### Evaluation Metrics and Terminology
+
+**Class Labels**
+- **RB (1):** Readily Biodegradable – Positive class.
+- **NRB (0):** Not Readily Biodegradable – Negative class.
+
+**Evaluation Metrics**
+- **Accuracy:** Proportion of correctly classified samples.
+- **AUC (Area Under the ROC Curve):** Measures the model's ability to distinguish between RB and NRB across different classification thresholds.
+- **Precision:** Proportion of predicted RB samples that are actually RB.
+- **Recall:** Proportion of actual RB samples correctly identified.
+- **F1 Score:** Harmonic mean of Precision and Recall.
+- **MCC (Matthews Correlation Coefficient):** Measures classification agreement using TP, TN, FP and FN. Values range from −1 to +1.
+
+**Classification Report Terms**
+- **Macro Avg:** Unweighted average of a metric across both classes, giving each class equal importance.
+- **Weighted Avg:** Average of a metric across both classes, weighted by the number of actual samples in each class.
+- **Support:** Number of actual samples belonging to each class.
+
 
 ## 6. Model Performance Observations
 
@@ -74,7 +96,7 @@ All metrics were calculated using the test dataset containing 211 observations.
 | Decision Tree | Achieved 81.52% accuracy, but lower AUC and MCC than Logistic Regression. Further training-set analysis would be needed to determine whether overfitting contributed to these results. |
 | KNN | Achieved 85.31% accuracy and 80.28% recall. Its performance was close to Logistic Regression, with slightly higher recall but lower precision, F1 and MCC. |
 | Gaussian Naive Bayes | Achieved the highest recall (94.37%) but comparatively low precision (52.76%), suggesting that it identifies most RB compounds while producing more false-positive classifications. |
-| SVM | Achieved the highest AUC (0.9189), indicating strong discrimination between the classes, although its F1 and MCC were below Logistic Regression at the evaluated decision boundary. |
+| SVM | The SVM model with an RBF kernel and sigmoid probability calibration achieved the highest AUC (0.9189), indicating strong discrimination between RB and NRB classes. It achieved 85.31% accuracy, with F1 (0.7770) and MCC (0.6679) slightly below Logistic Regression. |
 
 ### Overall Winning Model: Logistic Regression
 
