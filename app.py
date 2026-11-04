@@ -72,6 +72,7 @@ st.caption(
     "below and select the desired classifier from the dropdown."
 )
 
+
 # 3. Upload test dataset
 st.subheader("1. Upload Test Dataset")
 
@@ -80,35 +81,13 @@ uploaded_file = st.file_uploader(
     type=["csv"]
 )
 
-# 4. Model selection
-st.subheader("2. Select Classification Model")
 
-selected_model = st.selectbox(
-    "Choose a trained model",
-    list(MODEL_FILES.keys())
-)
-
-# 5. Load selected trained model
-model_path = Path(MODEL_FILES[selected_model])
-
-if not model_path.is_file():
-    st.error(f"Model file not found: {model_path}")
-    st.stop()
-
-@st.cache_resource
-def load_model(path):
-    return joblib.load(path)
-
-model = load_model(str(model_path))
-
-st.success(f"{selected_model} loaded successfully!")
-
-# 6. Display uploaded dataset
+# 4. Display uploaded dataset
 if uploaded_file is not None:
     try:
         test_df = pd.read_csv(uploaded_file)
 
-        st.subheader("3. Uploaded Dataset Preview")
+        st.subheader("2. Uploaded Dataset Preview")
 
         # Expandable dataset preview
         with st.expander("View Uploaded Dataset Preview", expanded=False):
@@ -121,14 +100,49 @@ if uploaded_file is not None:
 
         col1.metric("Total Records", len(test_df))
         col2.metric("Input Features", len(test_df.columns) - 1)
-        col3.metric("Target Column", "Present" if "target" in test_df.columns else "Missing")
+        col3.metric(
+            "Target Column",
+            "Present" if "target" in test_df.columns else "Missing"
+        )
 
-    except (pd.errors.ParserError, UnicodeDecodeError, ValueError, pd.errors.EmptyDataError) as e:
+    except (
+        pd.errors.ParserError,
+        UnicodeDecodeError,
+        ValueError,
+        pd.errors.EmptyDataError
+    ) as e:
         st.error(f"Unable to read CSV: {e}")
         st.stop()
 
 else:
     st.info("Upload test_data.csv to begin evaluation.")
+
+
+# 5. Model selection
+st.subheader("3. Select Classification Model")
+
+selected_model = st.selectbox(
+    "Choose a trained model",
+    list(MODEL_FILES.keys())
+)
+
+
+# 6. Load selected trained model
+model_path = Path(MODEL_FILES[selected_model])
+
+if not model_path.is_file():
+    st.error(f"Model file not found: {model_path}")
+    st.stop()
+
+
+@st.cache_resource
+def load_model(path):
+    return joblib.load(path)
+
+
+model = load_model(str(model_path))
+
+st.success(f"{selected_model} loaded successfully!")
 
 
 # 7. Evaluate the selected model using uploaded test data
@@ -144,7 +158,6 @@ if uploaded_file is not None:
     # Separate features and target
     X_test = test_df.drop(columns=["target"])
     y_test = test_df["target"]
-
 
     # Validate target labels
     if y_test.isna().any():
@@ -167,7 +180,6 @@ if uploaded_file is not None:
             "Only one target class was found. "
             "AUC cannot be calculated for this dataset."
         )
-
 
     # Verify required features are present
     expected_features = list(model.feature_names_in_)
@@ -192,7 +204,6 @@ if uploaded_file is not None:
 
     # Preserve the feature order used during training
     X_test = X_test[expected_features]
-
 
     # Validate numerical feature values
     try:
@@ -222,7 +233,6 @@ if uploaded_file is not None:
             "or non-finite numerical values."
         )
         st.stop()
-
 
     # Generate predictions without retraining
     y_pred = model.predict(X_test)
@@ -290,9 +300,9 @@ if uploaded_file is not None:
     plt.close(fig)
 
     st.caption(
-    "Rows represent actual classes and columns represent predicted classes. "
-    "Diagonal cells indicate correct predictions, while off-diagonal cells "
-    "indicate misclassifications. Darker shades represent higher sample counts."
+        "Rows represent actual classes and columns represent predicted classes. "
+        "Diagonal cells indicate correct predictions, while off-diagonal cells "
+        "indicate misclassifications. Darker shades represent higher sample counts."
     )
 
     # 9. Classification Report
