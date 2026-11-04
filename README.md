@@ -123,6 +123,8 @@ The application loads saved `.joblib` models and does not retrain models when ev
 
 ## 8. Installation and Execution
 
+**Python Version:** Python 3.11 (recommended and tested)
+
 Clone the repository:
 
 ```bash
