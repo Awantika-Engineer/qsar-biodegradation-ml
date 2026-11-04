@@ -97,14 +97,7 @@ All metrics were calculated using the test dataset containing 211 observations.
 | KNN | Achieved 85.31% accuracy and 80.28% recall. Its performance was close to Logistic Regression, with slightly higher recall but lower precision, F1 and MCC. |
 | Gaussian Naive Bayes | Achieved the highest recall (94.37%) but comparatively low precision (52.76%), suggesting that it identifies most RB compounds while producing more false-positive classifications. |
 | Support Vector Machine | The SVM model with an RBF kernel and sigmoid probability calibration achieved the highest AUC (0.9189), indicating strong discrimination between RB and NRB classes. It achieved 85.31% accuracy, with F1 (0.7770) and MCC (0.6679) slightly below Logistic Regression. |
-
-### Overall Winning Model: Logistic Regression
-
-Logistic Regression was selected as the best overall model for this experiment.
-
-It achieved the highest Accuracy, Precision, F1 Score, and MCC among the five classifiers.
-
-Although SVM achieved a slightly higher AUC and Gaussian Naive Bayes achieved higher Recall, Logistic Regression provided the strongest overall balance of classification metrics on the held-out test dataset.
+| Overall, Winner for your dataset? | **Logistic Regression** – Achieved the highest Accuracy (0.8626), Precision (0.8000), F1 (0.7943), and MCC (0.6912). Although SVM achieved a slightly higher AUC and Gaussian Naive Bayes achieved higher Recall, Logistic Regression provided the strongest overall balance of classification metrics on the held-out test dataset. |
 
 ## 7. Streamlit Application
 
