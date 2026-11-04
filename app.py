@@ -43,6 +43,35 @@ MODEL_FILES = {
     "SVM": "model/svm.joblib"
 }
 
+# Overall Model Performance Comparison
+st.subheader("Model Performance Comparison")
+
+comparison_df = pd.read_csv("results/model_comparison.csv")
+
+st.caption(
+    "Comparison based on the original held-out test dataset "
+    "(211 samples). These results were calculated during model evaluation."
+)
+
+with st.expander("View Performance of All Five Models", expanded=False):
+    st.dataframe(
+        comparison_df.style.format({
+            "Accuracy": "{:.4f}",
+            "AUC": "{:.4f}",
+            "Precision": "{:.4f}",
+            "Recall": "{:.4f}",
+            "F1": "{:.4f}",
+            "MCC": "{:.4f}"
+        }),
+        hide_index=True,
+        use_container_width=True
+    )
+
+st.caption(
+    "To evaluate an individual model, upload a labeled test CSV "
+    "below and select the desired classifier from the dropdown."
+)
+
 # 3. Upload test dataset
 st.subheader("1. Upload Test Dataset")
 
