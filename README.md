@@ -108,7 +108,7 @@ Although SVM achieved a slightly higher AUC and Gaussian Naive Bayes achieved hi
 
 ## 7. Streamlit Application
 
-**Live Application:** [Add URL after deployment]
+**Live Application:** https://qsar-biodegradation-ml-7oqrelvgbase8rypelckeu.streamlit.app/
 
 The Streamlit application supports:
 
