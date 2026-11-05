@@ -67,12 +67,6 @@ with st.expander("View Performance of All Five Models", expanded=False):
         use_container_width=True
     )
 
-st.caption(
-    "To evaluate an individual model, upload a labeled test CSV "
-    "below and select the desired classifier from the dropdown."
-)
-
-
 # 3. Upload test dataset
 st.subheader("1. Upload Test Dataset")
 
@@ -80,42 +74,48 @@ uploaded_file = st.file_uploader(
     "Upload CSV containing 41 features and the target column",
     type=["csv"]
 )
+st.caption(
+    "Saved test_data.csv is used by default. "
+    "Upload another labeled test CSV to replace it."
+)
 
 
-# 4. Display uploaded dataset
-if uploaded_file is not None:
-    try:
+# 4. Display test dataset
+test_df = None
+
+try:
+    if uploaded_file is not None:
         test_df = pd.read_csv(uploaded_file)
+    else:
+        test_df = pd.read_csv("test_data.csv")
 
-        st.subheader("2. Uploaded Dataset Preview")
+    st.subheader("2. Uploaded Dataset Preview")
 
-        # Expandable dataset preview
-        with st.expander("View Uploaded Dataset Preview", expanded=False):
-            st.dataframe(
-                test_df.head(10),
-                use_container_width=True
-            )
-
-        col1, col2, col3 = st.columns(3)
-
-        col1.metric("Total Records", len(test_df))
-        col2.metric("Input Features", len(test_df.columns) - 1)
-        col3.metric(
-            "Target Column",
-            "Present" if "target" in test_df.columns else "Missing"
+    # Expandable dataset preview
+    with st.expander("View Test Dataset Preview", expanded=False):
+        st.dataframe(
+            test_df.head(10),
+            use_container_width=True
         )
 
-    except (
-        pd.errors.ParserError,
-        UnicodeDecodeError,
-        ValueError,
-        pd.errors.EmptyDataError
-    ) as e:
-        st.error(f"Unable to read CSV: {e}")
-        st.stop()
+    col1, col2, col3 = st.columns(3)
 
-else:
-    st.info("Upload test_data.csv to begin evaluation.")
+    col1.metric("Total Records", len(test_df))
+    col2.metric("Input Features", len(test_df.columns) - 1)
+    col3.metric(
+        "Target Column",
+        "Present" if "target" in test_df.columns else "Missing"
+    )
+
+except (
+    FileNotFoundError,
+    pd.errors.ParserError,
+    UnicodeDecodeError,
+    ValueError,
+    pd.errors.EmptyDataError
+) as e:
+    st.error(f"Unable to read test CSV: {e}")
+    st.stop()
 
 
 # 5. Model selection
@@ -145,14 +145,15 @@ model = load_model(str(model_path))
 st.success(f"{selected_model} loaded successfully!")
 
 
-# 7. Evaluate the selected model using uploaded test data
-if uploaded_file is not None:
+
+# 7. Evaluate the selected model using test data
+if test_df is not None:
 
     st.subheader("4. Model Evaluation Results")
 
     # Validate that target column exists
     if "target" not in test_df.columns:
-        st.error("Uploaded CSV must contain a 'target' column.")
+        st.error("Test CSV must contain a 'target' column.")
         st.stop()
 
     # Separate features and target
@@ -267,7 +268,10 @@ if uploaded_file is not None:
     col1, col2, col3 = st.columns(3)
 
     col1.metric("Accuracy", f"{accuracy:.4f}")
-    col2.metric("AUC", f"{auc:.4f}" if auc is not None else "N/A")
+    col2.metric(
+        "AUC",
+        f"{auc:.4f}" if auc is not None else "N/A"
+    )
     col3.metric("Precision", f"{precision:.4f}")
 
     col4, col5, col6 = st.columns(3)
@@ -292,7 +296,11 @@ if uploaded_file is not None:
         display_labels=["NRB (0)", "RB (1)"]
     )
 
-    display.plot(ax=ax, cmap="Blues", colorbar=False)
+    display.plot(
+        ax=ax,
+        cmap="Blues",
+        colorbar=False
+    )
 
     ax.set_title(f"{selected_model} - Confusion Matrix")
 
@@ -321,7 +329,10 @@ if uploaded_file is not None:
 
     # Accuracy is already displayed separately in evaluation metrics.
     # Remove the duplicated accuracy row to avoid misleading columns.
-    report_df = report_df.drop(index="accuracy", errors="ignore")
+    report_df = report_df.drop(
+        index="accuracy",
+        errors="ignore"
+    )
 
     st.dataframe(
         report_df.style.format({
